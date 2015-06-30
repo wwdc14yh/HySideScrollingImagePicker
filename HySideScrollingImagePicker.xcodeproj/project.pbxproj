@@ -14,6 +14,12 @@
 		187D17C31B42437200E20007 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 187D17C21B42437200E20007 /* Images.xcassets */; };
 		187D17C61B42437200E20007 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 187D17C41B42437200E20007 /* LaunchScreen.xib */; };
 		187D17D21B42437200E20007 /* HySideScrollingImagePickerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17D11B42437200E20007 /* HySideScrollingImagePickerTests.m */; };
+		187D17E91B42444500E20007 /* AssetsLibraryD.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17DF1B42444500E20007 /* AssetsLibraryD.m */; };
+		187D17EA1B42444500E20007 /* HCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E11B42444500E20007 /* HCollectionViewCell.m */; };
+		187D17EB1B42444500E20007 /* HySideScrollingImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E31B42444500E20007 /* HySideScrollingImagePicker.m */; };
+		187D17EC1B42444500E20007 /* SideScrollingCheckCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E51B42444500E20007 /* SideScrollingCheckCell.m */; };
+		187D17ED1B42444500E20007 /* SideScrollingLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E71B42444500E20007 /* SideScrollingLayout.m */; };
+		187D17EF1B42445400E20007 /* ImageResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 187D17EE1B42445400E20007 /* ImageResources.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +46,17 @@
 		187D17CB1B42437200E20007 /* HySideScrollingImagePickerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HySideScrollingImagePickerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		187D17D01B42437200E20007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		187D17D11B42437200E20007 /* HySideScrollingImagePickerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HySideScrollingImagePickerTests.m; sourceTree = "<group>"; };
+		187D17DE1B42444500E20007 /* AssetsLibraryD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetsLibraryD.h; sourceTree = "<group>"; };
+		187D17DF1B42444500E20007 /* AssetsLibraryD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetsLibraryD.m; sourceTree = "<group>"; };
+		187D17E01B42444500E20007 /* HCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HCollectionViewCell.h; sourceTree = "<group>"; };
+		187D17E11B42444500E20007 /* HCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HCollectionViewCell.m; sourceTree = "<group>"; };
+		187D17E21B42444500E20007 /* HySideScrollingImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HySideScrollingImagePicker.h; sourceTree = "<group>"; };
+		187D17E31B42444500E20007 /* HySideScrollingImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HySideScrollingImagePicker.m; sourceTree = "<group>"; };
+		187D17E41B42444500E20007 /* SideScrollingCheckCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SideScrollingCheckCell.h; sourceTree = "<group>"; };
+		187D17E51B42444500E20007 /* SideScrollingCheckCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SideScrollingCheckCell.m; sourceTree = "<group>"; };
+		187D17E61B42444500E20007 /* SideScrollingLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SideScrollingLayout.h; sourceTree = "<group>"; };
+		187D17E71B42444500E20007 /* SideScrollingLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SideScrollingLayout.m; sourceTree = "<group>"; };
+		187D17EE1B42445400E20007 /* ImageResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ImageResources.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +98,7 @@
 		187D17B41B42437200E20007 /* HySideScrollingImagePicker */ = {
 			isa = PBXGroup;
 			children = (
+				187D17DB1B42443100E20007 /* HySideScrollingImagePickerClass */,
 				187D17B91B42437200E20007 /* AppDelegate.h */,
 				187D17BA1B42437200E20007 /* AppDelegate.m */,
 				187D17BC1B42437200E20007 /* ViewController.h */,
@@ -117,6 +135,32 @@
 				187D17D01B42437200E20007 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		187D17DB1B42443100E20007 /* HySideScrollingImagePickerClass */ = {
+			isa = PBXGroup;
+			children = (
+				187D17DD1B42444500E20007 /* ALAssetsLibrary */,
+				187D17EE1B42445400E20007 /* ImageResources.bundle */,
+				187D17E01B42444500E20007 /* HCollectionViewCell.h */,
+				187D17E11B42444500E20007 /* HCollectionViewCell.m */,
+				187D17E21B42444500E20007 /* HySideScrollingImagePicker.h */,
+				187D17E31B42444500E20007 /* HySideScrollingImagePicker.m */,
+				187D17E41B42444500E20007 /* SideScrollingCheckCell.h */,
+				187D17E51B42444500E20007 /* SideScrollingCheckCell.m */,
+				187D17E61B42444500E20007 /* SideScrollingLayout.h */,
+				187D17E71B42444500E20007 /* SideScrollingLayout.m */,
+			);
+			name = HySideScrollingImagePickerClass;
+			sourceTree = "<group>";
+		};
+		187D17DD1B42444500E20007 /* ALAssetsLibrary */ = {
+			isa = PBXGroup;
+			children = (
+				187D17DE1B42444500E20007 /* AssetsLibraryD.h */,
+				187D17DF1B42444500E20007 /* AssetsLibraryD.m */,
+			);
+			path = ALAssetsLibrary;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,6 +246,7 @@
 				187D17C11B42437200E20007 /* Main.storyboard in Resources */,
 				187D17C61B42437200E20007 /* LaunchScreen.xib in Resources */,
 				187D17C31B42437200E20007 /* Images.xcassets in Resources */,
+				187D17EF1B42445400E20007 /* ImageResources.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,9 +264,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				187D17ED1B42444500E20007 /* SideScrollingLayout.m in Sources */,
 				187D17BE1B42437200E20007 /* ViewController.m in Sources */,
+				187D17EC1B42444500E20007 /* SideScrollingCheckCell.m in Sources */,
+				187D17EA1B42444500E20007 /* HCollectionViewCell.m in Sources */,
 				187D17BB1B42437200E20007 /* AppDelegate.m in Sources */,
 				187D17B81B42437200E20007 /* main.m in Sources */,
+				187D17E91B42444500E20007 /* AssetsLibraryD.m in Sources */,
+				187D17EB1B42444500E20007 /* HySideScrollingImagePicker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
