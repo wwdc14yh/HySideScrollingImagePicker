@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3F7AE5C9-1F57-4FF9-9FF7-E33A461513CB</string>
+	<key>IDESourceControlProjectName</key>
+	<string>HySideScrollingImagePicker</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>14641E27ECCD2C5302999D1F4C6C3C540E68C900</key>
+		<string>https://github.com/lcddhr/HySideScrollingImagePicker.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>HySideScrollingImagePicker.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>14641E27ECCD2C5302999D1F4C6C3C540E68C900</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/lcddhr/HySideScrollingImagePicker.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>14641E27ECCD2C5302999D1F4C6C3C540E68C900</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>14641E27ECCD2C5302999D1F4C6C3C540E68C900</string>
+			<key>IDESourceControlWCCName</key>
+			<string>HySideScrollingImagePicker</string>
+		</dict>
+	</array>
+</dict>
+</plist>
