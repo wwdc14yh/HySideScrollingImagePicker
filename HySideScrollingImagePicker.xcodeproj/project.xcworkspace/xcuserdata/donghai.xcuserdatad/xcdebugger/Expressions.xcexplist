@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[HySideScrollingImagePicker toggleSelectionAtIndexPath:]:HySideScrollingImagePicker.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "(UIImage *)((UIImage *)0x00007fde92cc4510)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
