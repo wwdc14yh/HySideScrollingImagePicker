@@ -1,5 +1,7 @@
 # HySideScrollingImagePicker
 
+![image](http://github.com/wwdc14/HySideScrollingImagePicker/FixBranch/HySideScrollingImagePicker/Untitled.gif)
+
 1.已修复Block不存在导致crash
 2.已修复CollectionView多选重用,导致得到的数据混乱bug
 
@@ -30,5 +32,3 @@
         NSLog(@"index--%ld",Buttonindex);
     
     };
-    
-    ![image](http://github.com/wwdc14/HySideScrollingImagePicker/FixBranch/HySideScrollingImagePicker/Untitled.gif)
