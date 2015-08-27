@@ -31,4 +31,4 @@
     
     };
     
-    ![image](https://github.com/HySideScrollingImagePicker/Untitled.gif)
+    ![image](https://github.com/wwdc14@vip.qq.com/HySideScrollingImagePicker/Untitled.gif)
