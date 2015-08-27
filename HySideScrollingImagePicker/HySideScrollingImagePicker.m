@@ -509,7 +509,10 @@
     typeof(self) __weak weak = self;
     [self DismissBlock:^(BOOL Complete) {
         
-        weak.ButtonIndex(btns.tag-100);
+        if (weak.ButtonIndex) {
+
+                    weak.ButtonIndex(btns.tag-100);
+        }
         
     }];
     
