@@ -249,7 +249,7 @@
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         
         [TopView setFrame:CGRectMake(0, 0, W, H - height)];
-        [TopView setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.3f]];
+        [TopView setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f]];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height+10)];
         
     } completion:^(BOOL finished) {
@@ -547,7 +547,7 @@
     typeof(self) __weak weak = self;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         
-        [weak setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.3f]];
+        [weak setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f]];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height+10)];
         
     } completion:^(BOOL finished) {
