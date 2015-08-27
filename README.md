@@ -31,4 +31,4 @@
     
     };
     
-    
+    ![image](https://github.com/HySideScrollingImagePicker/Untitled.gif)
