@@ -283,21 +283,21 @@
     
     HCollectionViewCell *cell = (HCollectionViewCell *)[self.CollectionView cellForItemAtIndexPath:indexPath];
     SideScrollingCheckCell *checkmarkView = [self.indexPathToCheckViewTable objectForKey:indexPath];
-    
+    ALAsset *asset = self.allArr[(NSUInteger) indexPath.row];
     if (!_isMultipleSelection) {
         
         // Manage internal selection state
-        if ([self.selectedIndexes containsObject:cell.imageView.image]) {
-            [self.selectedIndexes removeObject:cell.imageView.image];
+        if ([self.selectedIndexes containsObject:asset]) {
+            [self.selectedIndexes removeObject:asset];
             [cell setSelected:NO];
             [checkmarkView setChecked:NO];
         } else {
-            [self.selectedIndexes addObject:cell.imageView.image];
+            [self.selectedIndexes addObject:asset];
             [cell setSelected:YES];
             [checkmarkView setChecked:YES];
         }
     }else{
-        [self.selectedIndexes addObject:cell.imageView.image];
+        [self.selectedIndexes addObject:asset];
         [cell setSelected:YES];
         [checkmarkView setChecked:YES];
         typeof(self) __weak weak = self;
