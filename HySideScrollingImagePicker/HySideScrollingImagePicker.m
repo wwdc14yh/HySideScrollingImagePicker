@@ -21,6 +21,7 @@
 #define W [UIScreen mainScreen].bounds.size.width
 #define Color [UIColor colorWithRed:26/255.0f green:178.0/255.0f blue:10.0f/255.0f alpha:1]
 #define Spacing 7.0f
+#define KMaxSize CGSizeMake(W-20, 100)
 
 
 @interface HySideScrollingImagePicker ()<UICollectionViewDataSource,UICollectionViewDelegate,UIGestureRecognizerDelegate>
@@ -81,7 +82,7 @@
 
 -(AssetsLibraryD *)lib{
     if (!_lib) {
-        _lib = [[AssetsLibraryD alloc] init];
+        _lib = [AssetsLibraryD sharedManager];
     }
     
     return _lib;
@@ -90,22 +91,7 @@
 -(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles{
     
     self = [super init];
-    _IndexPathArr = [NSMutableArray array];
     if (self) {
-        __weak HySideScrollingImagePicker *weakSlef = self;
-        _lib = [[AssetsLibraryD alloc] init];
-        
-        _lib.GetImageBlock = ^(NSArray *ImgsData){
-            
-            if (ImgsData.count != 0) {
-                weakSlef.cancelStr = str;
-                weakSlef.ButtonTitles = Titles;
-                [weakSlef LoadUI];
-            }
-            
-            
-        };
-        
         if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusRestricted) {
             NSLog(@"This application is not authorized to access photo data.");
         }else if([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusDenied){
@@ -116,12 +102,13 @@
                                                  cancelButtonTitle:@"确定"
                                                  otherButtonTitles:nil, nil];
             [alert show];
-            
         }else if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized){
             NSLog(@"SER已授权该应用程序访问数据的照片。");
             _cancelStr = str;
             _ButtonTitles = Titles;
+            _IndexPathArr = [NSMutableArray array];
             [self LoadUI];
+            NSLog(@"end");
         }else if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusNotDetermined){
             NSLog(@"用户还没有做出选择的问候这个应用程序");
         }
@@ -136,13 +123,17 @@
     [self setBackgroundColor:[UIColor clearColor]];
     /*end*/
     
+    _lib = [AssetsLibraryD sharedManager];
     /*buttomView*/
     UIView *ButtomView;
     UIView *TopView;
+    NSInteger Ids = 0;
     double version = [[UIDevice currentDevice].systemVersion doubleValue];//判定系统
     if (version >= 8.0f) {
-        UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        
+        UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
         ButtomView = [[UIVisualEffectView alloc] initWithEffect:blur];
+        
     }else if(version >= 7.0f){
         
         ButtomView = [[UIToolbar alloc] init];
@@ -150,9 +141,10 @@
     }else{
         
         ButtomView = [[UIView alloc] init];
+        Ids = true;
         
     }
-    if ([ButtomView isKindOfClass:[UIView class]]) {
+    if (Ids == 1) {
         ButtomView.backgroundColor = [UIColor colorWithRed:223.0f/255.0f green:226.0f/255.f blue:236.0f/255.0f alpha:1];
     }
     CGFloat height = ((ItemHeight+0.5f)+Spacing) + (_ButtonTitles.count * (ItemHeight+0.5f)) + kCollectionViewHeight;
@@ -170,11 +162,17 @@
     
     /*CanceBtn*/
     UIButton *Cancebtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [Cancebtn setBackgroundColor:[UIColor whiteColor]];
+    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
     [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(ButtomView.bounds) - ItemHeight, W, ItemHeight)];
     [Cancebtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [Cancebtn setTitle:_cancelStr forState:UIControlStateNormal];
     [Cancebtn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
+    [Cancebtn addTarget:self action:@selector(scaleToSmall:)
+  forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
+    [Cancebtn addTarget:self action:@selector(scaleAnimation:)
+  forControlEvents:UIControlEventTouchUpInside];
+    [Cancebtn addTarget:self action:@selector(scaleToDefault:)
+  forControlEvents:UIControlEventTouchDragExit];
     [Cancebtn setTag:100];
     [_BottomView addSubview:Cancebtn];
     /*end*/
@@ -184,18 +182,29 @@
         
         NSInteger index = [_ButtonTitles indexOfObject:Title];
         
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:1.0f]];
+        UIButton *btn = [[UIButton alloc] init];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
         
-        CGFloat hei = (50.5 * _ButtonTitles.count)+Spacing;
-        CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight+0.5))) - hei;
+        CGFloat hei = (50 * _ButtonTitles.count)+Spacing;
+        CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight))) - hei;
         
         [btn setFrame:CGRectMake(0, y, W, ItemHeight)];
         [btn setTag:(index + 100)+1];
         [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [btn setTitle:Title forState:UIControlStateNormal];
+        [btn titleLabel].font = [UIFont systemFontOfSize:15.0f];
         [btn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addTarget:self action:@selector(scaleToSmall:)
+       forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
+        [btn addTarget:self action:@selector(scaleAnimation:)
+       forControlEvents:UIControlEventTouchUpInside];
+        [btn addTarget:self action:@selector(scaleToDefault:)
+       forControlEvents:UIControlEventTouchDragExit];
+        
+        UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetHeight(btn.bounds) - 0.5f, W, 0.5f)];
+        lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
         [_BottomView addSubview:btn];
+        [btn addSubview:lin];
     }
     /*END*/
     
@@ -245,6 +254,10 @@
         [act stopAnimating];
         
     };
+    if (self.allArr.count == 0) {
+        self.allArr = [NSMutableArray arrayWithArray:_lib.assets];
+        [act stopAnimating];
+    }
     
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         
@@ -259,6 +272,30 @@
         
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
     }];
+}
+
+-(void)scaleToSmall:(UIButton *)btn{
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+    }];
+    
+}
+
+- (void)scaleAnimation:(UIButton *)btn{
+
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+    }];
+    
+}
+
+- (void)scaleToDefault:(UIButton *)btn{
+
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+    }];
+    
 }
 
 -(void)SelectedButtons:(UIButton *)btns{
@@ -321,7 +358,7 @@
     
     [collectionView selectItemAtIndexPath:indexPath animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
     [self toggleSelectionAtIndexPath:indexPath];
-    
+
 }
 
 - (void)toggleSelectionAtIndexPath:(NSIndexPath *)indexPath
@@ -432,6 +469,11 @@
     return YES;
 }
 
+-(void)dealloc{
+
+    NSLog(@"移除");
+}
+
 /*
  // Only override drawRect: if you perform custom drawing.
  // An empty implementation adversely affects performance during animation.
@@ -482,15 +524,35 @@
     /*end*/
     
     /*buttomView*/
-    UIView *ButtomView = [[UIView alloc] init];
-    
-    ButtomView.backgroundColor = [UIColor colorWithRed:223.0f/255.0f green:226.0f/255.f blue:236.0f/255.0f alpha:1];
+    UIView *ButtomView;
+    NSInteger Ids = 0;
+    double version = [[UIDevice currentDevice].systemVersion doubleValue];//判定系统
+    if (version >= 8.0f) {
+        
+        UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
+        ButtomView = [[UIVisualEffectView alloc] initWithEffect:blur];
+        
+    }else if(version >= 7.0f){
+        
+        ButtomView = [[UIToolbar alloc] init];
+        
+    }else{
+        
+        ButtomView = [[UIView alloc] init];
+        Ids = true;
+        
+    }
+    if (Ids == 1) {
+        ButtomView.backgroundColor = [UIColor colorWithRed:223.0f/255.0f green:226.0f/255.f blue:236.0f/255.0f alpha:1];
+    }
     CGFloat height;
+    UIFont *font = [UIFont systemFontOfSize:12.0f];
+    CGSize size = [self markGetAuthenticSize:_AttachTitle Font:font MaxSize:KMaxSize];
     
     if ([self isBlankString:_AttachTitle]) {
-        height = ((ItemHeight+0.5f)+Spacing) + (_Titles.count * (ItemHeight+0.5f));
+        height = ((ItemHeight)+Spacing) + (_Titles.count * (ItemHeight));
     }else{
-        height  = ((ItemHeight+0.5f)+Spacing) + (_Titles.count * (ItemHeight+0.5f)) + kSubTitleHeight;
+        height  = ((ItemHeight)+Spacing) + (_Titles.count * (ItemHeight)) + (size.height+50);
     }
     
     [ButtomView setFrame:CGRectMake(0, H , W, height)];
@@ -500,11 +562,17 @@
     
     /*CanceBtn*/
     UIButton *Cancebtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [Cancebtn setBackgroundColor:[UIColor whiteColor]];
     [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(ButtomView.bounds) - ItemHeight, W, ItemHeight)];
     [Cancebtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [Cancebtn setTitle:_CancelStr forState:UIControlStateNormal];
     [Cancebtn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
+    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+    [Cancebtn addTarget:self action:@selector(scaleToSmall:)
+       forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
+    [Cancebtn addTarget:self action:@selector(scaleAnimation:)
+       forControlEvents:UIControlEventTouchUpInside];
+    [Cancebtn addTarget:self action:@selector(scaleToDefault:)
+       forControlEvents:UIControlEventTouchDragExit];
     [Cancebtn setTag:100];
     [_ButtomView addSubview:Cancebtn];
     /*end*/
@@ -514,18 +582,31 @@
         
         NSInteger index = [_Titles indexOfObject:Title];
         
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
+        UIButton *btn = [[UIButton alloc] init];
         [btn setBackgroundColor:[UIColor whiteColor]];
         
-        CGFloat hei = (50.5 * _Titles.count)+Spacing;
-        CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight+0.5))) - hei;
+        CGFloat hei = (50 * _Titles.count)+Spacing;
+        CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight))) - hei;
         
         [btn setFrame:CGRectMake(0, y, W, ItemHeight)];
         [btn setTag:(index + 100)+1];
         [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [btn setTitle:Title forState:UIControlStateNormal];
         [btn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
+        [btn titleLabel].font = [UIFont systemFontOfSize:15.0f];
+        [btn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addTarget:self action:@selector(scaleToSmall:)
+      forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
+        [btn addTarget:self action:@selector(scaleAnimation:)
+      forControlEvents:UIControlEventTouchUpInside];
+        [btn addTarget:self action:@selector(scaleToDefault:)
+      forControlEvents:UIControlEventTouchDragExit];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+        
+        UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, 0, W, 0.5f)];
+        lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
         [_ButtomView addSubview:btn];
+        [btn addSubview:lin];
     }
     /*END*/
     
@@ -533,15 +614,17 @@
         
     }else{
         
-        UILabel *AttachTitleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, W, kSubTitleHeight)];
-        AttachTitleView.backgroundColor = [UIColor whiteColor];
-        AttachTitleView.font = [UIFont systemFontOfSize:12.0f];
+        UIView *views = [[UIView alloc] initWithFrame:CGRectMake(0, 0, W, size.height+50)];
+        views.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f];
+        UILabel *AttachTitleView = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, W-20, size.height+50)];
+        AttachTitleView.font = font;
         AttachTitleView.textColor = [UIColor grayColor];
         AttachTitleView.text = _AttachTitle;
+        AttachTitleView.numberOfLines = 0;
         AttachTitleView.textAlignment = 1;
-        
-        [_ButtomView addSubview:AttachTitleView];
-        
+        [_ButtomView addSubview:views];
+        [views addSubview:AttachTitleView];
+        [self layoutIfNeeded];
     }
     
     typeof(self) __weak weak = self;
@@ -556,6 +639,30 @@
         [weak addGestureRecognizer:tap];
         
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
+    }];
+    
+}
+
+-(void)scaleToSmall:(UIButton *)btn{
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+    }];
+    
+}
+
+- (void)scaleAnimation:(UIButton *)btn{
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+    }];
+    
+}
+
+- (void)scaleToDefault:(UIButton *)btn{
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
     }];
     
 }
@@ -625,6 +732,17 @@
         return YES;
     }
     return NO;
+}
+
+-(CGSize)markGetAuthenticSize:(NSString *)text Font:(UIFont *)font MaxSize:(CGSize)size{
+    
+    //获取当前那本属性
+    NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName, nil];
+    //实际尺寸
+    CGSize actualSize = [text boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:dic context:nil].size;
+    
+    return actualSize;
+    
 }
 
 @end

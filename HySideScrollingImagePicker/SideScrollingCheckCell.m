@@ -62,6 +62,7 @@
 
 - (void)setChecked:(BOOL)checked;
 {
+    [self PlayAnimation:checked];
     if (checked) {
         UIImage *emptyCheckmark = [UIImage imageNamed:@"ImageResources.bundle/FriendsSendsPicturesSelectBigYIcon.png"];
         self.imageView.image = emptyCheckmark;
@@ -72,9 +73,32 @@
     }
 }
 
+-(void)PlayAnimation:(BOOL )checked{
+
+    if (checked == YES)
+    {
+        CAKeyframeAnimation *k = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+        k.values = @[@(0.1),@(1.0),@(1.2)];
+        k.keyTimes = @[@(0.0),@(0.5),@(0.8),@(1.0)];
+        k.calculationMode = kCAAnimationLinear;
+        [self.imageView.layer addAnimation:k forKey:@"SHOW"];
+    }else{
+        
+        CAKeyframeAnimation *k = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+        k.values = @[@(1.0),@(0.1),@(1.0)];
+        k.keyTimes = @[@(0.0),@(0.5),@(0.8),@(1.0)];
+        k.calculationMode = kCAAnimationLinear;
+        [self.imageView.layer addAnimation:k forKey:@"SHOW"];
+        
+    }
+    
+}
+
 - (void)prepareForReuse
 {
-    [self setChecked:NO];
+    UIImage *fullCheckmark = [UIImage imageNamed:@"ImageResources.bundle/FriendsSendsPicturesSelectBigNIcon.png"];
+    self.imageView.image = fullCheckmark;
+    //[self setChecked:NO];
 }
 
 @end

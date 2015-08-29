@@ -17,6 +17,10 @@ typedef void(^UpDataBlock)(NSArray *ImgsData);
 
 @property (nonatomic,strong) NSMutableArray *UpDataImages;
 
+@property (nonatomic,strong) NSMutableArray *assets;
+
++(AssetsLibraryD  *)sharedManager;
+
 -(instancetype) init;
 
 @end

@@ -7,15 +7,25 @@
 //
 
 #import "AssetsLibraryD.h"
+#import <objc/runtime.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
 @interface AssetsLibraryD()
 
-@property (nonatomic,strong) NSMutableArray *assets;
-
 @end
 
 @implementation AssetsLibraryD
+
+static AssetsLibraryD *sharedAccountManagerInstance = nil;
+
++(AssetsLibraryD  *)sharedManager{
+    
+    static dispatch_once_t predicate;
+    dispatch_once(&predicate, ^{
+        sharedAccountManagerInstance = [[self alloc] init];
+    });
+    return sharedAccountManagerInstance;
+}
 
 -(instancetype) init{
     
@@ -32,44 +42,36 @@
 
 - (void)getCameraRollImages {
     _assets = [@[] mutableCopy];
-    __block NSMutableArray *tmpAssets = [@[] mutableCopy];
-    
-    
-    
-    ALAssetsLibrary *assetsLibrary = [AssetsLibraryD defaultAssetsLibrary];
-    [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-        [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-            if(result)
-            {
-                [tmpAssets addObject:result];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        ALAssetsLibrary *assetsLibrary = [AssetsLibraryD defaultAssetsLibrary];
+        [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+            if (group) {
+                *stop = true;
             }
+            ALAssetsGroupEnumerationResultsBlock assetsEnumerationBlock = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
+                if (result) {
+                    
+                    if (self.assets.count >= 100) {
+                        *stop = true;
+                        return ;
+                    }
+                    [self.assets insertObject:result atIndex:0];
+                }
+            };
+            if (self.GetImageBlock) {
+                self.GetImageBlock(_assets);
+                NSLog(@"_assets---%ld",_assets.count);
+            }
+            ALAssetsFilter *onlyPhotosFilter = [ALAssetsFilter allPhotos];
+            [group setAssetsFilter:onlyPhotosFilter];
+            [group enumerateAssetsUsingBlock:assetsEnumerationBlock];
+            
+        } failureBlock:^(NSError *error) {
+            NSLog(@"Error loading images %@", error);
         }];
         
-        
-        ALAssetsGroupEnumerationResultsBlock assetsEnumerationBlock = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
-            if (result) {
-                
-                //                NSString *urlstr=[NSString stringWithFormat:@"%@",result.defaultRepresentation.url];//图片的url
-                
-                //UIImage *image = [UIImage imageWithCGImage:[result aspectRatioThumbnail]];
-                //                if (self.assets.count >= 1500) {
-                //                    return ;
-                //                }
-                [self.assets addObject:result];
-            }
-        };
-        
-        ALAssetsFilter *onlyPhotosFilter = [ALAssetsFilter allPhotos];
-        [group setAssetsFilter:onlyPhotosFilter];
-        [group enumerateAssetsUsingBlock:assetsEnumerationBlock];
-        if (self.GetImageBlock) {
-            self.GetImageBlock(_assets);
-            NSLog(@"_assets---%ld",_assets.count);
-        }
-        //[self.collectionView reloadData];
-    } failureBlock:^(NSError *error) {
-        NSLog(@"Error loading images %@", error);
-    }];
+    });
 }
 
 + (ALAssetsLibrary *)defaultAssetsLibrary
