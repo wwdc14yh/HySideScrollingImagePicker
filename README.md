@@ -12,23 +12,53 @@
     HySideScrollingImagePicker *hy = [[HySideScrollingImagePicker alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"拍摄",@"从相册选择",@"更多"]];
     hy.isMultipleSelection = false;
     
-    hy.SeletedImages = ^(NSArray *GetImages, NSInteger Buttonindex){
+    typeof(self) weak = self;
+    
+    [hy SeletedImages:^(NSArray *GetImages, NSInteger Buttonindex) {
+       
+        NSMutableArray *INDEXPaths = [NSMutableArray array];
+        for (id OBJ in _DataSource) {
+            NSInteger INDEX = [_DataSource indexOfObject:OBJ];
+            [INDEXPaths addObject:[NSIndexPath indexPathForRow:INDEX inSection:0]];
+        }
+        [_DataSource removeAllObjects];
+        [weak.TableView deleteRowsAtIndexPaths:INDEXPaths withRowAnimation:UITableViewRowAnimationRight];
         
-        NSLog(@"GetImages-%@,Buttonindex-%ld",GetImages,(long)Buttonindex);
+        for (ALAsset *asset in GetImages) {
+            NSInteger index = [GetImages indexOfObject:asset];
+            UIImage *image = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
+            NSString *String = [NSString stringWithFormat:@"fileName:%@ \n Date:%@",asset.defaultRepresentation.filename,[asset valueForProperty: ALAssetPropertyDate]];
+            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+            [dict setObject:image forKey:@"image"];
+            [dict setObject:String forKey:@"string"];
+            [weak.DataSource addObject:dict];
+            [weak.TableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+        }
         
-    };
+        if (_DataSource.count != 0) {
+            [UIView animateWithDuration:0.2 animations:^{
+                [weak.TableView setAlpha:1.0f];
+            }];
+        }else{
+            [UIView animateWithDuration:0.2 animations:^{
+                [weak.TableView setAlpha:0.0f];
+            }];
+        }
+        
+    }];
+    
     [self.view insertSubview:hy atIndex:[[self.view subviews] count]];
     
 //显示自定义ActionSheet
 
-    HyActionSheet *action = [[HyActionSheet alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"退出登录"] AttachTitle:@"退出登录后不会删除任何历史数据, 下次登录依然可以使用本账号"];
+    HyActionSheet *action = [[HyActionSheet alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"退出登录",@"test",@"ABC",@"BCD"] AttachTitle:@"退出登录后不会删除任何历史数据, 下次登录依然可以使用本账号"];
     
     [action ChangeTitleColor:[UIColor redColor] AndIndex:1];
     
     [self.view addSubview:action];
     
-    action.ButtonIndex = ^(NSInteger Buttonindex){
-    
+    [action ButtonIndex:^(NSInteger Buttonindex) {
+       
         NSLog(@"index--%ld",Buttonindex);
-    
-    };
+        
+    }];
