@@ -12,35 +12,49 @@
 
 @interface AssetsLibraryD()
 
+@property (strong, nonatomic) ALAssetsLibrary *assetsLibrary;
+
+@property (assign, nonatomic) BOOL is;
+
 @end
 
 @implementation AssetsLibraryD
 
-static AssetsLibraryD *sharedAccountManagerInstance = nil;
-
-+(AssetsLibraryD  *)sharedManager{
-    
-    static dispatch_once_t predicate;
-    dispatch_once(&predicate, ^{
-        sharedAccountManagerInstance = [[self alloc] init];
-    });
-    return sharedAccountManagerInstance;
-}
-
--(instancetype) init{
-    
+-(instancetype) init
+{
     self = [super init];
     if (self) {
-        
-        [self getCameraRollImages];
-        
+        _is = true;
     }
-    
     return self;
 }
 
+- (NSMutableArray *)assets
+{
+    if (_assets == nil) {
+        _assets = [[NSMutableArray alloc] init];
+    }
+    return _assets;
+}
 
-- (void)getCameraRollImages {
+- (ALAssetsLibrary *)assetsLibrary
+{
+    if (_assetsLibrary == nil) {
+        _assetsLibrary = [[ALAssetsLibrary alloc] init];
+    }
+    return _assetsLibrary;
+}
+
+-(void)setUserIsOpen:(UserIsOpen)block
+{
+    _isopen = block;
+    [self getCameraRollImages];
+    
+}
+
+-(void)UpDataBlock:(UpDataBlock)block{
+
+    _GetImageBlock = block;
     _assets = [@[] mutableCopy];
     dispatch_async(dispatch_get_main_queue(), ^{
         
@@ -50,12 +64,8 @@ static AssetsLibraryD *sharedAccountManagerInstance = nil;
                 *stop = true;
             }
             ALAssetsGroupEnumerationResultsBlock assetsEnumerationBlock = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
+                
                 if (result) {
-                    
-                    if (self.assets.count >= 100) {
-                        *stop = true;
-                        return ;
-                    }
                     [self.assets insertObject:result atIndex:0];
                 }
             };
@@ -72,6 +82,44 @@ static AssetsLibraryD *sharedAccountManagerInstance = nil;
         }];
         
     });
+    
+}
+
+- (void)getCameraRollImages {
+    
+        
+        ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+        
+        [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+            
+            if (*stop) {
+                //点击“好”回调方法:这里是重点
+                NSLog(@"好");
+                if (_isopen) {
+                    if (_is) {
+                        _isopen(true);
+                        _is = false;
+                    }
+                }
+                return;
+                
+            }
+            *stop = TRUE;
+            
+        } failureBlock:^(NSError *error) {
+            
+            //点击“不允许”回调方法:这里是重点
+            NSLog(@"不允许");
+            if (_isopen) {
+                if (_is) {
+                    _isopen(false);
+                    _is = false;
+                }
+            }
+            
+        }];
+    
+    
 }
 
 + (ALAssetsLibrary *)defaultAssetsLibrary

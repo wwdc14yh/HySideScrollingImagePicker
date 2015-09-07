@@ -10,17 +10,22 @@
 #import <UIKit/UIKit.h>
 
 typedef void(^UpDataBlock)(NSArray *ImgsData);
+typedef void(^UserIsOpen)(BOOL is);
 
 @interface AssetsLibraryD : NSObject
 
 @property (nonatomic,strong) UpDataBlock GetImageBlock;
 
+@property (nonatomic,strong) UserIsOpen isopen;
+
 @property (nonatomic,strong) NSMutableArray *UpDataImages;
 
 @property (nonatomic,strong) NSMutableArray *assets;
 
-+(AssetsLibraryD  *)sharedManager;
-
 -(instancetype) init;
+
+-(void)setUserIsOpen:(UserIsOpen)block;
+
+-(void)UpDataBlock:(UpDataBlock)block;
 
 @end

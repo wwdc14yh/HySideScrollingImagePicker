@@ -17,7 +17,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [AssetsLibraryD sharedManager];
+    //[AssetsLibraryD sharedManager];
     // Override point for customization after application launch.
     return YES;
 }

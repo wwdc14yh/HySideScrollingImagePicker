@@ -36,8 +36,6 @@
 
 @property (nonatomic, strong) NSMapTable *indexPathToCheckViewTable;
 
-@property (nonatomic, strong) ALAssetsGroup *group;
-
 @property (nonatomic,strong) NSMutableArray *allArr;
 
 @property (nonatomic, strong) NSMutableArray *selectedIndexes;
@@ -48,7 +46,7 @@
 
 @property (nonatomic,retain)NSMutableArray *IndexPathArr;
 
-@property (nonatomic,strong)AssetsLibraryD *lib;
+@property (retain, nonatomic) AssetsLibraryD *assets;
 
 @end
 
@@ -73,45 +71,13 @@
 
 @implementation HySideScrollingImagePicker
 
--(NSMutableArray *)assetsGroups{
-    if (!_assetsGroups) {
-        _assetsGroups=[[NSMutableArray alloc]init];
-    }
-    return _assetsGroups;
-}
-
--(AssetsLibraryD *)lib{
-    if (!_lib) {
-        _lib = [AssetsLibraryD sharedManager];
-    }
-    
-    return _lib;
-}
-
 -(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles{
     
     self = [super init];
     if (self) {
-        if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusRestricted) {
-            NSLog(@"This application is not authorized to access photo data.");
-        }else if([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusDenied){
-            NSLog(@"用户已经明确否认了这一应用程序访问数据的照片。");
-            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"读取失败"
-                                                           message:@"请打开 设置-隐私-照片 来进行设置"
-                                                          delegate:self
-                                                 cancelButtonTitle:@"确定"
-                                                 otherButtonTitles:nil, nil];
-            [alert show];
-        }else if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized){
-            NSLog(@"SER已授权该应用程序访问数据的照片。");
-            _cancelStr = str;
-            _ButtonTitles = Titles;
-            _IndexPathArr = [NSMutableArray array];
-            [self LoadUI];
-            NSLog(@"end");
-        }else if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusNotDetermined){
-            NSLog(@"用户还没有做出选择的问候这个应用程序");
-        }
+        _cancelStr = str;
+        _ButtonTitles = Titles;
+        [self loadData];
     }
     return self;
 }
@@ -123,7 +89,6 @@
     [self setBackgroundColor:[UIColor clearColor]];
     /*end*/
     
-    _lib = [AssetsLibraryD sharedManager];
     /*buttomView*/
     UIView *ButtomView;
     UIView *TopView;
@@ -200,10 +165,12 @@
        forControlEvents:UIControlEventTouchUpInside];
         [btn addTarget:self action:@selector(scaleToDefault:)
        forControlEvents:UIControlEventTouchDragExit];
-        
+        [_BottomView addSubview:btn];
+        if ((index+1) == _ButtonTitles.count) {
+            break;
+        }
         UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetHeight(btn.bounds) - 0.5f, W, 0.5f)];
         lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
-        [_BottomView addSubview:btn];
         [btn addSubview:lin];
     }
     /*END*/
@@ -240,24 +207,26 @@
     
     UIActivityIndicatorView *act = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.CollectionView.bounds)/2 - 10 , CGRectGetHeight(self.CollectionView.bounds)/2 - 10, 20, 20)];
     act.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+    [act setTag:10101];
     [act startAnimating];
     [self.CollectionView addSubview:act];
     
     /*enb*/
-    
     typeof(self) __weak weak = self;
+    __block BOOL stop = true;
     
-    _lib.GetImageBlock = ^(NSArray *ImgsData){
-        
-        weak.allArr = [NSMutableArray arrayWithArray:ImgsData];
-        [weak.CollectionView reloadData];
-        [act stopAnimating];
-        
-    };
-    if (self.allArr.count == 0) {
-        self.allArr = [NSMutableArray arrayWithArray:_lib.assets];
-        [act stopAnimating];
-    }
+    [_assets UpDataBlock:^(NSArray *ImgsData)
+    {
+        if (stop) {
+            weak.allArr = [NSMutableArray arrayWithArray:ImgsData];
+            [weak.CollectionView reloadData];
+            [act stopAnimating];
+            if (ImgsData.count != 0) {
+                stop = FALSE;
+            }
+        }
+    }];
+    
     
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         
@@ -269,15 +238,38 @@
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:weak action:@selector(dismiss:)];
         tap.delegate = self;
         [TopView addGestureRecognizer:tap];
-        
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
+    }];
+}
+
+-(AssetsLibraryD *)assets
+{
+    if (!_assets) {
+        _assets = [[AssetsLibraryD alloc] init];
+    }
+    return _assets;
+}
+
+-(void)loadData{
+
+    typeof(self) __weak weak = self;
+    _assets = [self assets];
+    //UIActivityIndicatorView *act=  (UIActivityIndicatorView *)[self viewWithTag:10101];
+    [_assets setUserIsOpen:^(BOOL is) {
+        
+        if (!is) {
+            return ;
+        }
+        _IndexPathArr = [NSMutableArray array];
+        [weak LoadUI];
+        NSLog(@"end");
     }];
 }
 
 -(void)scaleToSmall:(UIButton *)btn{
     
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.0f]];
     }];
     
 }
@@ -285,7 +277,7 @@
 - (void)scaleAnimation:(UIButton *)btn{
 
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.0f]];
     }];
     
 }
@@ -312,7 +304,7 @@
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section;
 {
-    return _allArr.count;
+    return MIN(100, _allArr.count);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -429,7 +421,6 @@
 
 -(void)DismissBlock:(CompleteAnimationBlock)block{
     
-    
     //typeof(self) __weak weak = self;
     CGFloat height = ((ItemHeight+0.5f)+Spacing) + (_ButtonTitles.count * (ItemHeight+0.5f)) + kCollectionViewHeight;
     UIView *TopView = [self viewWithTag:999];
@@ -446,6 +437,11 @@
         
     }];
     
+}
+
+-(void)SeletedImages:(SeletedImages)SeletedImage{
+
+    _SeletedImages = SeletedImage;
 }
 
 -(void)dismiss:(UITapGestureRecognizer *)tap{
@@ -474,13 +470,23 @@
     NSLog(@"移除");
 }
 
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
+-(void)addSubview:(UIView *)view{
+
+    [super addSubview:view];
+
+}
+
+-(UIViewController *)viewController:(UIView *)view{
+    /// Finds the view's view controller.
+    // Traverse responder chain. Return first found view controller, which will be the view's view controller.
+    UIResponder *responder = view;
+    while ((responder = [responder nextResponder]))
+        if ([responder isKindOfClass: [UIViewController class]])
+            return (UIViewController *)responder;
+    // If the view controller isn't found, return nil.
+    return nil;
+}
+
 
 @end
 
@@ -525,6 +531,7 @@
     
     /*buttomView*/
     UIView *ButtomView;
+    UIView *TopView;
     NSInteger Ids = 0;
     double version = [[UIDevice currentDevice].systemVersion doubleValue];//判定系统
     if (version >= 8.0f) {
@@ -558,6 +565,12 @@
     [ButtomView setFrame:CGRectMake(0, H , W, height)];
     _ButtomView = ButtomView;
     [self addSubview:ButtomView];
+    
+    TopView = [[UIView alloc] init];
+    TopView.backgroundColor = [UIColor clearColor];
+    [TopView setTag:999];
+    [TopView setFrame:CGRectMake(0, 0, W, H)];
+    [self addSubview:TopView];
     /*end*/
     
     /*CanceBtn*/
@@ -566,7 +579,7 @@
     [Cancebtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [Cancebtn setTitle:_CancelStr forState:UIControlStateNormal];
     [Cancebtn addTarget:self action:@selector(SelectedButtons:) forControlEvents:UIControlEventTouchUpInside];
-    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f]];
     [Cancebtn addTarget:self action:@selector(scaleToSmall:)
        forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragEnter];
     [Cancebtn addTarget:self action:@selector(scaleAnimation:)
@@ -601,7 +614,7 @@
       forControlEvents:UIControlEventTouchUpInside];
         [btn addTarget:self action:@selector(scaleToDefault:)
       forControlEvents:UIControlEventTouchDragExit];
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f]];
         
         UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, 0, W, 0.5f)];
         lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
@@ -615,7 +628,7 @@
     }else{
         
         UIView *views = [[UIView alloc] initWithFrame:CGRectMake(0, 0, W, size.height+50)];
-        views.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f];
+        views.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f];
         UILabel *AttachTitleView = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, W-20, size.height+50)];
         AttachTitleView.font = font;
         AttachTitleView.textColor = [UIColor grayColor];
@@ -630,14 +643,15 @@
     typeof(self) __weak weak = self;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         
-        [weak setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f]];
+        //[weak setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f]];
+        [TopView setFrame:CGRectMake(0, 0, W, H - height)];
+        [TopView setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f]];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height+10)];
         
     } completion:^(BOOL finished) {
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:weak action:@selector(dismiss:)];
         tap.delegate = self;
-        [weak addGestureRecognizer:tap];
-        
+        [TopView addGestureRecognizer:tap];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
     }];
     
@@ -646,7 +660,7 @@
 -(void)scaleToSmall:(UIButton *)btn{
     
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.0f]];
     }];
     
 }
@@ -654,7 +668,7 @@
 - (void)scaleAnimation:(UIButton *)btn{
     
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.1f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.0f]];
     }];
     
 }
@@ -662,7 +676,7 @@
 - (void)scaleToDefault:(UIButton *)btn{
     
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f]];
     }];
     
 }
@@ -689,6 +703,12 @@
     
 }
 
+-(void)ButtonIndex:(SeletedButtonIndex)ButtonIndex{
+
+    _ButtonIndex = ButtonIndex;
+    
+}
+
 -(void)dismiss:(UITapGestureRecognizer *)tap{
     
     if( CGRectContainsPoint(self.frame, [tap locationInView:_ButtomView])) {
@@ -706,16 +726,19 @@
     
     typeof(self) __weak weak = self;
     CGFloat height = ((ItemHeight+0.5f)+Spacing) + (_Titles.count * (ItemHeight+0.5f)) + kCollectionViewHeight;
+    UIView *TopView = [self viewWithTag:999];
     
     [UIView animateWithDuration:0.4f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         
-        [weak setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0f]];
+        [TopView setFrame:CGRectMake(0, 0, W, H)];
+        [TopView setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0f]];
+        
         [_ButtomView setFrame:CGRectMake(0, H, W, height)];
         
     } completion:^(BOOL finished) {
         
         block(finished);
-        [self removeFromSuperview];
+        [weak removeFromSuperview];
         
     }];
     

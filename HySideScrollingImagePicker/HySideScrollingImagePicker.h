@@ -23,6 +23,8 @@ typedef void(^CompleteAnimationBlock)(BOOL Complete);
 
 -(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles;
 
+-(void)SeletedImages:(SeletedImages)SeletedImage;
+
 -(void)DismissBlock:(CompleteAnimationBlock)block;
 
 @end
@@ -32,6 +34,8 @@ typedef void(^CompleteAnimationBlock)(BOOL Complete);
 @property (nonatomic,strong)    SeletedButtonIndex ButtonIndex;
 
 -(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles AttachTitle:(NSString *)AttachTitle;
+
+-(void)ButtonIndex:(SeletedButtonIndex)ButtonIndex;
 
 -(void) ChangeTitleColor:(UIColor *)color AndIndex:(NSInteger )index;
 
