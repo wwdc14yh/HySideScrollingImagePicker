@@ -2,13 +2,12 @@
 
 ![image](https://raw.githubusercontent.com/wwdc14/HySideScrollingImagePicker/FixBranch/HySideScrollingImagePicker/Untitled.gif)
 
-1.已修复Block不存在导致crash
-2.已修复CollectionView多选重用,导致得到的数据混乱bug
+# 1.已修复Block不存在导致crash
+# 2.已修复CollectionView多选重用,导致得到的数据混乱bug
+# 3.修复BUG:获取系统图片,图片过多的时候会崩溃.
 
-修复BUG:获取系统图片,图片过多的时候会崩溃.
-
-//显示图片预览:
-
+### Example【示例】
+```objc
     HySideScrollingImagePicker *hy = [[HySideScrollingImagePicker alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"拍摄",@"从相册选择",@"更多"]];
     hy.isMultipleSelection = false;
     
@@ -46,11 +45,12 @@
         }
         
     }];
-    
     [self.view insertSubview:hy atIndex:[[self.view subviews] count]];
     
-//显示自定义ActionSheet
+```
 
+### 显示自定义ActionSheet
+```objc
     HyActionSheet *action = [[HyActionSheet alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"退出登录",@"test",@"ABC",@"BCD"] AttachTitle:@"退出登录后不会删除任何历史数据, 下次登录依然可以使用本账号"];
     
     [action ChangeTitleColor:[UIColor redColor] AndIndex:1];
@@ -62,3 +62,4 @@
         NSLog(@"index--%ld",Buttonindex);
         
     }];
+```
