@@ -2,10 +2,6 @@
 
 ![image](https://raw.githubusercontent.com/wwdc14/HySideScrollingImagePicker/FixBranch/HySideScrollingImagePicker/Untitled.gif)
 
-# 1.已修复Block不存在导致crash
-# 2.已修复CollectionView多选重用,导致得到的数据混乱bug
-# 3.修复BUG:获取系统图片,图片过多的时候会崩溃.
-
 ### Example【示例】
 ```objc
     HySideScrollingImagePicker *hy = [[HySideScrollingImagePicker alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"拍摄",@"从相册选择",@"更多"]];
@@ -63,3 +59,14 @@
         
     }];
 ```
+# Bugs
+* 已修复Block不存在导致crash
+* 已修复CollectionView多选重用,导致得到的数据混乱bug
+* 修复BUG:获取系统图片,图片过多的时候会崩溃.
+* 
+## 期待
+
+* 如果在使用过程中遇到BUG，希望你能Issues我
+* 将模仿进行到底,让更多新手开发者了解比较酷的界面实现思路... 
+* 如果觉得好用请Star!
+* 谢谢!
