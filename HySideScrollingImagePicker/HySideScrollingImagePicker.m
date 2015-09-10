@@ -26,6 +26,10 @@
 
 @interface HySideScrollingImagePicker ()<UICollectionViewDataSource,UICollectionViewDelegate,UIGestureRecognizerDelegate>
 
+{
+    UIWindow *window;
+}
+
 @property (nonatomic,copy)NSString *cancelStr;
 
 @property (nonatomic,strong)NSArray *ButtonTitles;
@@ -254,7 +258,6 @@
 
     typeof(self) __weak weak = self;
     _assets = [self assets];
-    //UIActivityIndicatorView *act=  (UIActivityIndicatorView *)[self viewWithTag:10101];
     [_assets setUserIsOpen:^(BOOL is) {
         
         if (!is) {
@@ -262,6 +265,7 @@
         }
         _IndexPathArr = [NSMutableArray array];
         [weak LoadUI];
+        [weak show];
         NSLog(@"end");
     }];
 }
@@ -424,16 +428,16 @@
     //typeof(self) __weak weak = self;
     CGFloat height = ((ItemHeight+0.5f)+Spacing) + (_ButtonTitles.count * (ItemHeight+0.5f)) + kCollectionViewHeight;
     UIView *TopView = [self viewWithTag:999];
-    
+    typeof(self) __block weak = self;
     [UIView animateWithDuration:0.4f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         [TopView setFrame:CGRectMake(0, 0, W, H)];
         [TopView setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.0f]];
-        [_BottomView setFrame:CGRectMake(0, H, W, height)];
+        [weak.BottomView setFrame:CGRectMake(0, H, W, height)];
         
     } completion:^(BOOL finished) {
         
         block(finished);
-        [self removeFromSuperview];
+        [weak removeFromSuperview];
         
     }];
     
@@ -465,16 +469,42 @@
     return YES;
 }
 
--(void)dealloc{
-
-    NSLog(@"移除");
+-(void)dealloc
+{
+    NSArray *SubViews = [window subviews];
+    for (id obj in SubViews) {
+        [obj removeFromSuperview];
+    }
+    [window resignKeyWindow];
+    [window removeFromSuperview];
+    window = nil;
+    NSLog(@"正常释放");
 }
 
--(void)addSubview:(UIView *)view{
-
-    [super addSubview:view];
-
+-(void)removeFromSuperview{
+    _allArr = nil;
+    _ButtonTitles = nil;
+    _BottomView = nil;
+    _CollectionView = nil;
+    _assets = nil;
+    _assetsGroups = nil;
+    _IndexPathArr = nil;
+    _lastIndexPath = nil;
+    _selectedIndexes = nil;
+    _SeletedImages = nil;
+    _indexPathToCheckViewTable = nil;
+    [super removeFromSuperview];
 }
+
+-(void)show{
+    window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    window.windowLevel = UIWindowLevelAlert;
+    window.backgroundColor = [UIColor clearColor];
+    window.alpha = 1;
+    window.hidden = false;
+    [window addSubview:self];
+}
+
 
 -(UIViewController *)viewController:(UIView *)view{
     /// Finds the view's view controller.
@@ -493,6 +523,9 @@
 @class HyActionSheet;
 
 @interface HyActionSheet ()<UIGestureRecognizerDelegate>
+{
+    UIWindow *window;
+}
 
 @property (nonatomic,copy)      NSString *CancelStr;
 
@@ -516,6 +549,7 @@
         _CancelStr = str;
         _Titles = Titles;
         [self loadUI];
+        [self show];
         
     }
     
@@ -617,7 +651,7 @@
         [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f]];
         
         UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, 0, W, 0.5f)];
-        lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
+        lin.backgroundColor = [UIColor colorWithWhite:0.85f alpha:1];
         [_ButtomView addSubview:btn];
         [btn addSubview:lin];
     }
@@ -755,6 +789,26 @@
         return YES;
     }
     return NO;
+}
+
+-(void)show{
+    window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    window.windowLevel = UIWindowLevelAlert;
+    window.backgroundColor = [UIColor clearColor];
+    window.alpha = 1;
+    window.hidden = false;
+    [window addSubview:self];
+}
+
+-(void)dealloc{
+    NSArray *SubViews = [window subviews];
+    for (id obj in SubViews) {
+        [obj removeFromSuperview];
+    }
+    [window resignKeyWindow];
+    [window removeFromSuperview];
+    window = nil;
+    NSLog(@"正常释放");
 }
 
 -(CGSize)markGetAuthenticSize:(NSString *)text Font:(UIFont *)font MaxSize:(CGSize)size{

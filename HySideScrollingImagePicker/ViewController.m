@@ -29,7 +29,6 @@
     _TableView.separatorStyle = UITableViewCellSelectionStyleNone;
     
     NSArray *titleArr = @[@"ImagePicker",@"ActionSheet"];
-    
     for (NSString *title in titleArr) {
         NSInteger index = [titleArr indexOfObject:title];
         UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -92,10 +91,7 @@
                 [weak.TableView setAlpha:0.0f];
             }];
         }
-        
     }];
-    
-    [self.view insertSubview:hy atIndex:[[self.view subviews] count]];
 }
 
 - (void)ActionSheet:(UIButton *)sender {
@@ -103,8 +99,6 @@
     HyActionSheet *action = [[HyActionSheet alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"退出登录",@"test",@"ABC",@"BCD"] AttachTitle:@"退出登录后不会删除任何历史数据, 下次登录依然可以使用本账号"];
     
     [action ChangeTitleColor:[UIColor redColor] AndIndex:1];
-    
-    [self.view addSubview:action];
     
     [action ButtonIndex:^(NSInteger Buttonindex) {
        

@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>B8BDF878-90F5-444B-A082-4345F22CF7B3</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>HySideScrollingImagePicker</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>C621A07DFBF7E4F50B4D748ED38A667F0919807C</key>
 		<string>github.com:wwdc14/HySideScrollingImagePicker.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>HySideScrollingImagePicker.xcodeproj/project.xcworkspace</string>
+	<string>HySideScrollingImagePicker.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>C621A07DFBF7E4F50B4D748ED38A667F0919807C</key>

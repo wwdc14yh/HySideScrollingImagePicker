@@ -54,6 +54,7 @@
 
 -(void)UpDataBlock:(UpDataBlock)block{
 
+    typeof(self) __weak weak = self;
     _GetImageBlock = block;
     _assets = [@[] mutableCopy];
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -66,11 +67,11 @@
             ALAssetsGroupEnumerationResultsBlock assetsEnumerationBlock = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
                 
                 if (result) {
-                    [self.assets insertObject:result atIndex:0];
+                    [weak.assets insertObject:result atIndex:0];
                 }
             };
-            if (self.GetImageBlock) {
-                self.GetImageBlock(_assets);
+            if (weak.GetImageBlock) {
+                weak.GetImageBlock(_assets);
                 NSLog(@"_assets---%ld",_assets.count);
             }
             ALAssetsFilter *onlyPhotosFilter = [ALAssetsFilter allPhotos];
@@ -87,18 +88,17 @@
 
 - (void)getCameraRollImages {
     
-        
+        typeof(self) __weak weak = self;
         ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
-        
         [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
             
             if (*stop) {
                 //点击“好”回调方法:这里是重点
                 NSLog(@"好");
-                if (_isopen) {
-                    if (_is) {
-                        _isopen(true);
-                        _is = false;
+                if (weak.isopen) {
+                    if (weak.is) {
+                        weak.isopen(true);
+                        weak.is = false;
                     }
                 }
                 return;
@@ -110,10 +110,10 @@
             
             //点击“不允许”回调方法:这里是重点
             NSLog(@"不允许");
-            if (_isopen) {
-                if (_is) {
-                    _isopen(false);
-                    _is = false;
+            if (weak.isopen) {
+                if (weak.is) {
+                    weak.isopen(false);
+                    weak.is = false;
                 }
             }
             
