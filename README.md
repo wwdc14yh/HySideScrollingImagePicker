@@ -29,6 +29,7 @@
 * 已修复Block不存在导致crash
 * 已修复CollectionView多选重用,导致得到的数据混乱bug
 * 修复BUG:获取系统图片,图片过多的时候会崩溃.
+* 针对屏幕旋转做了支持 - Made support for screen rotation
 
 ## 期待
 * 如果在使用过程中遇到BUG，希望你能Issues我
