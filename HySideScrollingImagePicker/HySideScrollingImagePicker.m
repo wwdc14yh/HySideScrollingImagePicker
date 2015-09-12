@@ -82,14 +82,74 @@
         _cancelStr = str;
         _ButtonTitles = Titles;
         [self loadData];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(statusBarOrientationChange:)
+                                                     name:UIApplicationDidChangeStatusBarOrientationNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)statusBarOrientationChange:(NSNotification *)notification
+{
+    [self adaptUIBaseOnOriention];//比如改变self.frame
+}
+
+-(void)adaptUIBaseOnOriention
+{
+    CGFloat height = ((ItemHeight+0.5f)+Spacing) + (_ButtonTitles.count * (ItemHeight+0.5f)) + kCollectionViewHeight;
+    UIView *TopView = [self viewWithTag:999];
+    [TopView setFrame:CGRectMake(0, 0, W, H - height)];
+    if (height > H) {
+        [_BottomView setFrame:CGRectMake(0, 0, W, H)];
+        NSLog(@"%f",CGRectGetMaxY(_CollectionView.frame));
+        CGFloat He = H - (CGRectGetMaxY(_CollectionView.frame) + Spacing*2);
+        CGFloat BtnH = He / ((_ButtonTitles.count)+1);
+        UIButton *Cancebtn = (UIButton *)[self viewWithTag:100];
+        [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(self.bounds) - BtnH, W, BtnH)];
+        for (NSString *Title in _ButtonTitles) {
+            NSInteger index = [_ButtonTitles indexOfObject:Title];
+            
+            UIButton *btn = (UIButton *)[_BottomView viewWithTag:(index + 100)+1];
+            //CGFloat hei = (BtnH * _ButtonTitles.count)+Spacing;
+            //CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (BtnH))) - hei;
+            CGFloat Y = (BtnH *index) + (CGRectGetMaxY(_CollectionView.frame) +Spacing);
+            [btn setFrame:CGRectMake(0, Y, W, BtnH)];
+            UIView *lin = [btn viewWithTag:(index + 1010)+1];
+            [lin setFrame:CGRectMake(0, CGRectGetHeight(btn.bounds) - 0.5f, W, 0.5f)];
+        }
+        return;
+    }
+    [_BottomView setFrame:CGRectMake(0, H - height, W, height)];
+    UIButton *Cancebtn = (UIButton *)[self viewWithTag:100];
+    [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(_BottomView.bounds) - ItemHeight, W, ItemHeight)];
+    for (NSString *Title in _ButtonTitles) {
+        NSInteger index = [_ButtonTitles indexOfObject:Title];
+        
+        UIButton *btn = (UIButton *)[_BottomView viewWithTag:(index + 100)+1];
+        CGFloat hei = (50 * _ButtonTitles.count)+Spacing;
+        CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight))) - hei;
+        [btn setFrame:CGRectMake(0, y, W, ItemHeight)];
+        UIView *lin = [btn viewWithTag:(index + 1010)+1];
+        [lin setFrame:CGRectMake(0, CGRectGetHeight(btn.bounds) - 0.5f, W, 0.5f)];
+    }
+}
+
+- (UIViewController *)appRootViewController
+{
+    UIViewController *appRootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+    UIViewController *topVC = appRootVC;
+    while (topVC.presentedViewController) {
+        topVC = topVC.presentedViewController;
+    }
+    return topVC;
 }
 
 -(void)LoadUI{
     self.selectedIndexes = [NSMutableArray array];
     /*self*/
     [self setFrame:CGRectMake(0, 0, W, H)];
+    self.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleBottomMargin;
     [self setBackgroundColor:[UIColor clearColor]];
     /*end*/
     
@@ -120,12 +180,14 @@
     
     [ButtomView setFrame:CGRectMake(0, H, W, height)];
     _BottomView = ButtomView;
+    ButtomView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin;
     [self addSubview:ButtomView];
     
     TopView = [[UIView alloc] init];
     TopView.backgroundColor = [UIColor clearColor];
     [TopView setTag:999];
     [TopView setFrame:CGRectMake(0, 0, W, H)];
+    TopView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
     [self addSubview:TopView];
     /*end*/
     
@@ -143,6 +205,7 @@
     [Cancebtn addTarget:self action:@selector(scaleToDefault:)
   forControlEvents:UIControlEventTouchDragExit];
     [Cancebtn setTag:100];
+    Cancebtn.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
     [_BottomView addSubview:Cancebtn];
     /*end*/
     
@@ -169,12 +232,15 @@
        forControlEvents:UIControlEventTouchUpInside];
         [btn addTarget:self action:@selector(scaleToDefault:)
        forControlEvents:UIControlEventTouchDragExit];
+        btn.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
         [_BottomView addSubview:btn];
         if ((index+1) == _ButtonTitles.count) {
             break;
         }
         UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetHeight(btn.bounds) - 0.5f, W, 0.5f)];
         lin.backgroundColor = [UIColor colorWithRed:228.0f/255 green:229.0f/255 blue:230.f/255 alpha:1];
+        [lin setTag:(index + 1010)+1];
+        lin.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
         [btn addSubview:lin];
     }
     /*END*/
@@ -195,6 +261,7 @@
     collectionView.allowsSelection = YES;
     collectionView.showsHorizontalScrollIndicator = NO;
     collectionView.collectionViewLayout = flow;
+    collectionView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
     [collectionView registerClass:[HCollectionViewCell class] forCellWithReuseIdentifier:@"Cell"];
     [collectionView registerClass:[SideScrollingCheckCell class] forSupplementaryViewOfKind:@"check" withReuseIdentifier:@"CheckCell"];
     collectionView.contentInset = UIEdgeInsetsMake(0, 6, 0, 6);
@@ -265,9 +332,21 @@
         }
         _IndexPathArr = [NSMutableArray array];
         [weak LoadUI];
-        [weak show];
+        [weak addSubview];
         NSLog(@"end");
     }];
+}
+
+-(void)addSubview
+{
+    UIViewController *toVC = [self appRootViewController];
+    if (toVC.tabBarController != nil) {
+        [toVC.tabBarController.view addSubview:self];
+    }else if (toVC.navigationController != nil){
+        [toVC.navigationController.view addSubview:self];
+    }else{
+        [toVC.view addSubview:self];
+    }
 }
 
 -(void)scaleToSmall:(UIButton *)btn{
@@ -478,6 +557,7 @@
     [window resignKeyWindow];
     [window removeFromSuperview];
     window = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSLog(@"正常释放");
 }
 
