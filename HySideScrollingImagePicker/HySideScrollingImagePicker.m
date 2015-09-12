@@ -448,7 +448,7 @@
     HCollectionViewCell *cell = (HCollectionViewCell *)[self.CollectionView cellForItemAtIndexPath:indexPath];
     SideScrollingCheckCell *checkmarkView = [self.indexPathToCheckViewTable objectForKey:indexPath];
     
-    if (!_isMultipleSelection) {
+    if (_isMultipleSelection) {
         
         // Manage internal selection state
         if ([self.IndexPathArr containsObject:indexPath]) {

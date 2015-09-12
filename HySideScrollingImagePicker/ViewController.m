@@ -57,7 +57,7 @@
 - (void)ImagePicker:(UIButton *)sender {
     
     HySideScrollingImagePicker *hy = [[HySideScrollingImagePicker alloc] initWithCancelStr:@"取消" otherButtonTitles:@[@"拍摄",@"从相册选择",@"更多"]];
-    hy.isMultipleSelection = false;
+    hy.isMultipleSelection = true;
     
     typeof(self) weak = self;
     
