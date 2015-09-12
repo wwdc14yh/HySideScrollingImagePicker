@@ -310,6 +310,11 @@
         tap.delegate = self;
         [TopView addGestureRecognizer:tap];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
+        [UIView animateWithDuration:0.2 animations:^{
+            if (height > H) {
+                [weak adaptUIBaseOnOriention];
+            }
+        }];
     }];
 }
 
@@ -629,17 +634,95 @@
         _CancelStr = str;
         _Titles = Titles;
         [self loadUI];
-        [self show];
-        
+        [self addSubview];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(statusBarOrientationChange:)
+                                                     name:UIApplicationDidChangeStatusBarOrientationNotification
+                                                   object:nil];
     }
     
     return self;
 }
 
+-(void)addSubview
+{
+    UIViewController *toVC = [self appRootViewController];
+    if (toVC.tabBarController != nil) {
+        [toVC.tabBarController.view addSubview:self];
+    }else if (toVC.navigationController != nil){
+        [toVC.navigationController.view addSubview:self];
+    }else{
+        [toVC.view addSubview:self];
+    }
+}
+
+- (void)statusBarOrientationChange:(NSNotification *)notification
+{
+    [self adaptUIBaseOnOriention];
+}
+
+-(void)adaptUIBaseOnOriention
+{
+    CGFloat height;
+    UIFont *font = [UIFont systemFontOfSize:12.0f];
+    if ([self isBlankString:_AttachTitle]) {
+        height = ((ItemHeight)+Spacing) + (_Titles.count * (ItemHeight));
+    }else{
+        CGSize size = [self markGetAuthenticSize:_AttachTitle Font:font MaxSize:KMaxSize];
+        height  = ((ItemHeight)+Spacing) + (_Titles.count * (ItemHeight)) + (size.height+50);
+    }
+    UIView *views = [self viewWithTag:9090];
+    UIView *TopView = [self viewWithTag:999];
+    [TopView setFrame:CGRectMake(0, 0, W, H - height)];
+    if (height > H) {
+        [_ButtomView setFrame:CGRectMake(0, 0, W, H)];
+        CGFloat He = H - (CGRectGetHeight(views.bounds) + Spacing);
+        CGFloat BtnH = He / ((_Titles.count)+1);
+        UIButton *Cancebtn = (UIButton *)[self viewWithTag:100];
+        [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(self.bounds) - BtnH, W, BtnH)];
+        for (NSString *Title in _Titles) {
+            NSInteger index = [_Titles indexOfObject:Title];
+            
+            UIButton *btn = (UIButton *)[_ButtomView viewWithTag:(index + 100)+1];
+            //CGFloat hei = (BtnH * _ButtonTitles.count)+Spacing;
+            //CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (BtnH))) - hei;
+            CGFloat Y = (BtnH *index) + (CGRectGetHeight(views.bounds));
+            [btn setFrame:CGRectMake(0, Y, W, BtnH)];
+            UIView *lin = [btn viewWithTag:(index + 1010)+1];
+            [lin setFrame:CGRectMake(0, 0.5f, W, 0.5f)];
+        }
+        return;
+    }
+    [_ButtomView setFrame:CGRectMake(0, H - height, W, height)];
+    UIButton *Cancebtn = (UIButton *)[self viewWithTag:100];
+    [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(_ButtomView.bounds) - ItemHeight, W, ItemHeight)];
+    for (NSString *Title in _Titles) {
+        NSInteger index = [_Titles indexOfObject:Title];
+        
+        UIButton *btn = (UIButton *)[_ButtomView viewWithTag:(index + 100)+1];
+        CGFloat Y = (ItemHeight *index) + (CGRectGetHeight(views.bounds));
+        [btn setFrame:CGRectMake(0, Y, W, ItemHeight)];
+        UIView *lin = [btn viewWithTag:(index + 1010)+1];
+        [lin setFrame:CGRectMake(0, 0, W, 0.5f)];
+    }
+}
+
+- (UIViewController *)appRootViewController
+{
+    UIViewController *appRootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+    UIViewController *topVC = appRootVC;
+    while (topVC.presentedViewController) {
+        topVC = topVC.presentedViewController;
+    }
+    return topVC;
+}
+
+
 -(void)loadUI{
     
     /*self*/
     [self setFrame:CGRectMake(0, 0, W, H)];
+    self.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleBottomMargin;
     [self setBackgroundColor:[UIColor clearColor]];
     /*end*/
     
@@ -678,12 +761,14 @@
     
     [ButtomView setFrame:CGRectMake(0, H , W, height)];
     _ButtomView = ButtomView;
+    ButtomView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin;
     [self addSubview:ButtomView];
     
     TopView = [[UIView alloc] init];
     TopView.backgroundColor = [UIColor clearColor];
     [TopView setTag:999];
     [TopView setFrame:CGRectMake(0, 0, W, H)];
+    TopView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
     [self addSubview:TopView];
     /*end*/
     
@@ -728,11 +813,14 @@
       forControlEvents:UIControlEventTouchUpInside];
         [btn addTarget:self action:@selector(scaleToDefault:)
       forControlEvents:UIControlEventTouchDragExit];
+        btn.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
         [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f]];
         
         UIView *lin = [[UIView alloc]initWithFrame:CGRectMake(0, 0, W, 0.5f)];
         lin.backgroundColor = [UIColor colorWithWhite:0.85f alpha:1];
         [_ButtomView addSubview:btn];
+        [lin setTag:(index + 1010)+1];
+        lin.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
         [btn addSubview:lin];
     }
     /*END*/
@@ -742,15 +830,19 @@
     }else{
         
         UIView *views = [[UIView alloc] initWithFrame:CGRectMake(0, 0, W, size.height+50)];
+        views.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleWidth;
+        
         views.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.6f];
         UILabel *AttachTitleView = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, W-20, size.height+50)];
         AttachTitleView.font = font;
         AttachTitleView.textColor = [UIColor grayColor];
         AttachTitleView.text = _AttachTitle;
         AttachTitleView.numberOfLines = 0;
+        AttachTitleView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         AttachTitleView.textAlignment = 1;
         [_ButtomView addSubview:views];
         [views addSubview:AttachTitleView];
+        [views setTag:9090];
         [self layoutIfNeeded];
     }
     
@@ -767,6 +859,11 @@
         tap.delegate = self;
         [TopView addGestureRecognizer:tap];
         [ButtomView setFrame:CGRectMake(0, H - height, W, height)];
+        [UIView animateWithDuration:0.2 animations:^{
+            if (height > H) {
+                [weak adaptUIBaseOnOriention];
+            }
+        }];
     }];
     
 }
@@ -888,6 +985,7 @@
     [window resignKeyWindow];
     [window removeFromSuperview];
     window = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSLog(@"正常释放");
 }
 
