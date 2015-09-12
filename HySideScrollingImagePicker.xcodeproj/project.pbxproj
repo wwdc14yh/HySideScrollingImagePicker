@@ -20,8 +20,8 @@
 		187D17EC1B42444500E20007 /* SideScrollingCheckCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E51B42444500E20007 /* SideScrollingCheckCell.m */; };
 		187D17ED1B42444500E20007 /* SideScrollingLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 187D17E71B42444500E20007 /* SideScrollingLayout.m */; };
 		187D17EF1B42445400E20007 /* ImageResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 187D17EE1B42445400E20007 /* ImageResources.bundle */; };
-		871029181B9D814300663CA8 /* Untitled.gif in Resources */ = {isa = PBXBuildFile; fileRef = 871029171B9D814300663CA8 /* Untitled.gif */; };
 		875F7A841B9C370B00E0D013 /* ParallAxTableViewCells.m in Sources */ = {isa = PBXBuildFile; fileRef = 875F7A831B9C370B00E0D013 /* ParallAxTableViewCells.m */; };
+		87A105F31BA4C8EC00F84D2F /* Untitled.gif in Resources */ = {isa = PBXBuildFile; fileRef = 87A105F21BA4C8EC00F84D2F /* Untitled.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,9 +59,9 @@
 		187D17E61B42444500E20007 /* SideScrollingLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SideScrollingLayout.h; sourceTree = "<group>"; };
 		187D17E71B42444500E20007 /* SideScrollingLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SideScrollingLayout.m; sourceTree = "<group>"; };
 		187D17EE1B42445400E20007 /* ImageResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ImageResources.bundle; sourceTree = "<group>"; };
-		871029171B9D814300663CA8 /* Untitled.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Untitled.gif; sourceTree = "<group>"; };
 		875F7A821B9C370B00E0D013 /* ParallAxTableViewCells.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParallAxTableViewCells.h; sourceTree = "<group>"; };
 		875F7A831B9C370B00E0D013 /* ParallAxTableViewCells.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParallAxTableViewCells.m; sourceTree = "<group>"; };
+		87A105F21BA4C8EC00F84D2F /* Untitled.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Untitled.gif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,7 +174,7 @@
 		87732B371B8EA474003AD697 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				871029171B9D814300663CA8 /* Untitled.gif */,
+				87A105F21BA4C8EC00F84D2F /* Untitled.gif */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -263,7 +263,7 @@
 				187D17C61B42437200E20007 /* LaunchScreen.xib in Resources */,
 				187D17C31B42437200E20007 /* Images.xcassets in Resources */,
 				187D17EF1B42445400E20007 /* ImageResources.bundle in Resources */,
-				871029181B9D814300663CA8 /* Untitled.gif in Resources */,
+				87A105F31BA4C8EC00F84D2F /* Untitled.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
