@@ -11,7 +11,9 @@
 #import "HCollectionViewCell.h"
 #import "SideScrollingCheckCell.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <Photos/Photos.h>
 #import "AssetsLibraryD.h"
+
 
 #define kImageSpacing 5.0f
 #define kCollectionViewHeight 178.0f
@@ -111,8 +113,6 @@
             NSInteger index = [_ButtonTitles indexOfObject:Title];
             
             UIButton *btn = (UIButton *)[_BottomView viewWithTag:(index + 100)+1];
-            //CGFloat hei = (BtnH * _ButtonTitles.count)+Spacing;
-            //CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (BtnH))) - hei;
             CGFloat Y = (BtnH *index) + (CGRectGetMaxY(_CollectionView.frame) +Spacing);
             [btn setFrame:CGRectMake(0, Y, W, BtnH)];
             UIView *lin = [btn viewWithTag:(index + 1010)+1];
@@ -193,7 +193,7 @@
     
     /*CanceBtn*/
     UIButton *Cancebtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+    [Cancebtn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5f]];
     [Cancebtn setFrame:CGRectMake(0, CGRectGetHeight(ButtomView.bounds) - ItemHeight, W, ItemHeight)];
     [Cancebtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [Cancebtn setTitle:_cancelStr forState:UIControlStateNormal];
@@ -215,7 +215,7 @@
         NSInteger index = [_ButtonTitles indexOfObject:Title];
         
         UIButton *btn = [[UIButton alloc] init];
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5f]];
         
         CGFloat hei = (50 * _ButtonTitles.count)+Spacing;
         CGFloat y = (CGRectGetMinY(Cancebtn.frame) + (index * (ItemHeight))) - hei;
@@ -286,8 +286,8 @@
     typeof(self) __weak weak = self;
     __block BOOL stop = true;
     
-    [_assets UpDataBlock:^(NSArray *ImgsData)
-    {
+    [_assets GetPhotosBlock:^(NSArray *ImgsData) {
+       
         if (stop) {
             weak.allArr = [NSMutableArray arrayWithArray:ImgsData];
             [weak.CollectionView reloadData];
@@ -296,8 +296,8 @@
                 stop = FALSE;
             }
         }
+        
     }];
-    
     
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:0 options:UIViewAnimationOptionLayoutSubviews animations:^{
         
@@ -373,7 +373,7 @@
 - (void)scaleToDefault:(UIButton *)btn{
 
     [UIView animateWithDuration:0.2 animations:^{
-        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.7f]];
+        [btn setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5f]];
     }];
     
 }
@@ -400,12 +400,12 @@
 {
     HCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
     
-    ALAsset *asset = [_allArr objectAtIndex:indexPath.row];
+    id asset = [_allArr objectAtIndex:indexPath.row];
     
-    UIImage *image = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
+    //UIImage *image = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
     
     cell.asset = asset;
-    cell.imageView.image = image;
+    //cell.imageView.image = image;
     return cell;
 }
 
@@ -495,9 +495,26 @@
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 {
     
-    ALAsset *asset = [_allArr objectAtIndex:indexPath.row];
+    id asset = [_allArr objectAtIndex:indexPath.row];
+    static UIImage *image = nil;
     
-    UIImage *imageAtPath = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
+    if ([asset isKindOfClass:[ALAsset class]]) {
+        
+        image = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
+        
+    }else if ([asset isKindOfClass:[PHAsset class]]){
+        CGFloat scale = [UIScreen mainScreen].scale;
+        PHAsset *PHAsset = asset;
+        NSLog(@"scale-%f",scale);
+        PHCachingImageManager *imageManager = [[PHCachingImageManager alloc] init];
+        [imageManager requestImageForAsset:PHAsset targetSize:CGSizeMake(PHAsset.pixelWidth / scale, PHAsset.pixelHeight * scale) contentMode:PHImageContentModeAspectFit options:nil resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            if (result) {
+                image = result;
+            }
+        }];
+    }
+    
+    UIImage *imageAtPath = image;
     
     CGFloat imageHeight = imageAtPath.size.height;
     CGFloat viewHeight = collectionView.bounds.size.height;
@@ -555,14 +572,6 @@
 
 -(void)dealloc
 {
-    NSArray *SubViews = [window subviews];
-    for (id obj in SubViews) {
-        [obj removeFromSuperview];
-    }
-    [window resignKeyWindow];
-    [window removeFromSuperview];
-    window = nil;
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSLog(@"正常释放");
 }
 
@@ -578,6 +587,14 @@
     _selectedIndexes = nil;
     _SeletedImages = nil;
     _indexPathToCheckViewTable = nil;
+    NSArray *SubViews = [window subviews];
+    for (id obj in SubViews) {
+        [obj removeFromSuperview];
+    }
+    [window resignKeyWindow];
+    [window removeFromSuperview];
+    window = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super removeFromSuperview];
 }
 
@@ -978,7 +995,11 @@
 }
 
 -(void)dealloc{
-    NSArray *SubViews = [window subviews];
+    NSLog(@"正常释放");
+}
+
+-(void)removeFromSuperview{
+    NSArray *SubViews = [self subviews];
     for (id obj in SubViews) {
         [obj removeFromSuperview];
     }
@@ -986,7 +1007,8 @@
     [window removeFromSuperview];
     window = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    NSLog(@"正常释放");
+    [super removeFromSuperview];
+    NSLog(@"不能正常结束?");
 }
 
 -(CGSize)markGetAuthenticSize:(NSString *)text Font:(UIFont *)font MaxSize:(CGSize)size{

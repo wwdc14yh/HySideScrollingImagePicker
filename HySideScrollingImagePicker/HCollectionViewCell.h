@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AssetsLibrary/AssetsLibrary.h>
+
 @interface HCollectionViewCell : UICollectionViewCell
 
 @property (nonatomic, strong) UIImageView *imageView;
 
-@property (nonatomic, retain) ALAsset *asset;
+@property (nonatomic, retain) id asset;
 
 @end

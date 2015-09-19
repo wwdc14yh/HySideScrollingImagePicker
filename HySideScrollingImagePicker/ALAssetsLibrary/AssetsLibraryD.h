@@ -22,10 +22,10 @@ typedef void(^UserIsOpen)(BOOL is);
 
 @property (nonatomic,strong) NSMutableArray *assets;
 
--(instancetype) init;
-
 -(void)setUserIsOpen:(UserIsOpen)block;
 
 -(void)UpDataBlock:(UpDataBlock)block;
+
+-(void)GetPhotosBlock:(UpDataBlock)block;
 
 @end

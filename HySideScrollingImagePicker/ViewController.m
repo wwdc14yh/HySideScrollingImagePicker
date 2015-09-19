@@ -74,6 +74,9 @@
         for (ALAsset *asset in GetImages) {
             NSInteger index = [GetImages indexOfObject:asset];
             UIImage *image = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
+            if (image == nil) {
+                image = [UIImage imageWithCGImage:[asset aspectRatioThumbnail]];
+            }
             NSString *String = [NSString stringWithFormat:@"fileName:%@ \n Date:%@",asset.defaultRepresentation.filename,[asset valueForProperty: ALAssetPropertyDate]];
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
             [dict setObject:image forKey:@"image"];
