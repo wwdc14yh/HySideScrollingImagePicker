@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+@class ALAsset;
 //Blocks
-typedef void(^SeletedImages)(NSArray *GetImages, NSInteger Buttonindex);
+typedef void(^SeletedImages)(NSArray<ALAsset *> *GetImages, NSInteger Buttonindex);
 
 typedef void(^SeletedButtonIndex)(NSInteger Buttonindex);
 
@@ -21,7 +22,7 @@ typedef void(^CompleteAnimationBlock)(BOOL Complete);
 
 @property (nonatomic,strong) SeletedImages SeletedImages;
 
--(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles;
+-(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray<NSString *> *)Titles;
 
 -(void)SeletedImages:(SeletedImages)SeletedImage;
 
@@ -33,7 +34,7 @@ typedef void(^CompleteAnimationBlock)(BOOL Complete);
 
 @property (nonatomic,strong)    SeletedButtonIndex ButtonIndex;
 
--(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray *)Titles AttachTitle:(NSString *)AttachTitle;
+-(instancetype) initWithCancelStr:(NSString *)str otherButtonTitles:(NSArray<NSString *> *)Titles AttachTitle:(NSString *)AttachTitle;
 
 -(void)ButtonIndex:(SeletedButtonIndex)ButtonIndex;
 

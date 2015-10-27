@@ -78,20 +78,23 @@
     typeof(self) __weak weak = self;
     _GetImageBlock = block;
     _assets = [@[] mutableCopy];
+    //NSMutableArray *countArr = [NSMutableArray array];
     dispatch_async(dispatch_get_main_queue(), ^{
         
         ALAssetsLibrary *assetsLibrary = [AssetsLibraryD defaultAssetsLibrary];
         [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-            //NSString *name = [group valueForProperty:ALAssetsGroupPropertyName];
+            NSString *name = [group valueForProperty:ALAssetsGroupPropertyName];
             //NSLog(@"groupName__ %@ ",name);
-            //if ([name isEqualToString:@"All Photos"] || [name isEqualToString:@"Camera Roll"]) {
-                [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-                    
-                    if (result) {
-                        [weak.assets insertObject:result atIndex:0];
-                    }
-                }];
-            //}
+            if ([name isEqualToString:@"All Photos"] || [name isEqualToString:@"Camera Roll"]) {
+                *stop = true;
+            NSLog(@"---%ld  --Name-%@",[group numberOfAssets],name);
+            
+            [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
+                if (result) {
+                    [weak.assets addObject:result];
+                }
+            }];
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) {
                     block(_assets);
@@ -108,16 +111,7 @@
 
 -(void)GetPhotosBlock:(UpDataBlock)block
 {
-    float version = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (version < 7.0f && version > 9.0f)
-    {
-        [self UpDataBlock:block];
-    }
-    else if (version > 8.f && version <= 9.0)
-    {
-        [self UpDataBlock:block];
-        //[self Ios9LoadImageBlock:block];
-    }
+    [self UpDataBlock:block];
 }
 
 - (void)getCameraRollImages {
