@@ -79,22 +79,22 @@
     _GetImageBlock = block;
     _assets = [@[] mutableCopy];
     //NSMutableArray *countArr = [NSMutableArray array];
-    dispatch_async(dispatch_get_main_queue(), ^{
+    //dispatch_async(dispatch_get_main_queue(), ^{
         
         ALAssetsLibrary *assetsLibrary = [AssetsLibraryD defaultAssetsLibrary];
         [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-            NSString *name = [group valueForProperty:ALAssetsGroupPropertyName];
+           // NSString *name = [group valueForProperty:ALAssetsGroupPropertyName];
             //NSLog(@"groupName__ %@ ",name);
-            if ([name isEqualToString:@"All Photos"] || [name isEqualToString:@"Camera Roll"]) {
-                *stop = true;
-            NSLog(@"---%ld  --Name-%@",[group numberOfAssets],name);
+           // if ([name isEqualToString:@"All Photos"] || [name isEqualToString:@"Camera Roll"]) {
+            //    *stop = true;
+            //NSLog(@"---%ld  --Name-%@",[group numberOfAssets],name);
             
             [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
                 if (result) {
                     [weak.assets addObject:result];
                 }
             }];
-            }
+            //}
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) {
                     block(_assets);
@@ -104,7 +104,7 @@
         } failureBlock:^(NSError *error) {
             NSLog(@"Error loading images %@", error);
         }];
-    });
+   // });
     
 }
 
